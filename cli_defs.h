@@ -2,9 +2,12 @@
 #define _CLI_DEFS_H_
 
 #include <stddef.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #define MAX_BUF_SIZE        128     /* Maximum size of CLI Rx buffer */ 
-#define CMD_TERMINATOR      '\r'    /* Delimitor denoting end of cmd */
+#define MAX_ARGS            30
+#define CMD_TERMINATOR      '\n'    /* Delimitor denoting end of cmd */
 
 typedef enum
 {
@@ -41,5 +44,15 @@ typedef struct
     size_t cmd_cnt;             /* Number of commands in cmd_tbl.                          */
 } cli_t;
 
+/*!
+ * @brief Struct for holding received data 
+ */
+typedef struct
+{
+    uint8_t buf[MAX_BUF_SIZE];      /* CLI Rx byte-buffer */
+    uint8_t *buf_ptr;               /* Pointer to Rx byte-buffer */
+    uint8_t buf_length;             /* Length of buffer */
+    bool is_ready;                  /* Is a command fully received and ready to be processed */
+} rx_data_t;
 
 #endif

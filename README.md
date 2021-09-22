@@ -112,3 +112,8 @@ cli_status_t echo_func(int argc, char **argv)
     return rslt;
 }
 ```
+
+## Building
+The example main.c file is used by the make file to build. Confirm gcc/make is installed. Then simply run `make` and the program will be compiled.  
+You can run the program by running `./cli`   
+You will see a prompt for the cli and can send commands. 

@@ -35,20 +35,15 @@
 #include <stdint.h>
 #include <string.h>
 
-static uint8_t buf[MAX_BUF_SIZE];      /* CLI Rx byte-buffer */
-static uint8_t *buf_ptr;               /* Pointer to Rx byte-buffer */
+rx_data_t rx_data;
 
-static uint8_t cmd_buf[MAX_BUF_SIZE];  /* CLI command buffer */
-static uint8_t *cmd_ptr;               /* Pointer to command buffer */
-
-const char cli_prompt[] = ">> ";       /* CLI prompt displayed to the user */
-const char cli_unrecog[] = "CMD: Command not recognised";
+const char cli_prompt[] = ">> ";                    /* CLI prompt displayed to the user */
+const char cli_ready[] = "<< cli ready\n";          /* CLI prompt displayed to the user */
+const char cli_unrecog[] = "CMD: Command not recognized\n";
 const char *cli_error_msg[] = {
     "OK",
-    "Command not recognised"
+    "Command not recognized"
 };
-
-
 
 
 /*!
@@ -61,11 +56,14 @@ static void cli_print(cli_t *cli, const char *msg);
  */
 cli_status_t cli_init(cli_t *cli)
 {
-    /* Set buffer ptr to beginning of buf */
-    buf_ptr = buf;
+    /* Reset buffer */
+    memset(rx_data.buf, 0, sizeof(rx_data.buf));
+    rx_data.buf_length = 0;
+    rx_data.is_ready = false;
+    rx_data.buf_ptr = rx_data.buf;
 
-    /* Print the CLI prompt. */
-    cli_print(cli, cli_prompt);
+    /* Print the CLI ready prompt. */
+    cli_print(cli, cli_ready);
 
     return CLI_OK;
 }
@@ -85,13 +83,20 @@ cli_status_t cli_deinit(cli_t *cli)
 cli_status_t cli_process(cli_t *cli)
 {
     uint8_t argc = 0;
-    char *argv[30];
+    char *argv[MAX_ARGS];
+
+    if(rx_data.is_ready == false)
+    {
+        return CLI_E_CMD_NOT_FOUND;
+    }
+
+    rx_data.is_ready = false;
 
     /* Get the first token (cmd name) */
-    argv[argc] = strtok(cmd_buf, " ");
+    argv[argc] = strtok((char *)rx_data.buf, " ");
 
     /* Walk through the other tokens (parameters) */
-    while((argv[argc] != NULL) && (argc < 30))
+    while((argv[argc] != NULL) && (argc < MAX_ARGS))
     {
         argv[++argc] = strtok(NULL, " ");
     }
@@ -108,6 +113,8 @@ cli_status_t cli_process(cli_t *cli)
     }
 
     /* Command not found */
+    rx_data.buf_length = 0;
+    memset(rx_data.buf, 0,sizeof(rx_data.buf));
     cli_print(cli, cli_unrecog);
     return CLI_E_CMD_NOT_FOUND;
 }
@@ -120,28 +127,34 @@ cli_status_t cli_put(cli_t *cli, char c)
 {
     switch(c)
     {
-    case '\r':
+    case CMD_TERMINATOR:
         
-        *buf_ptr = '\0';            /* Terminate the msg and reset the msg ptr.      */
-        strcpy(cmd_buf, buf);       /* Copy string to command buffer for processing. */
-        buf_ptr = buf;              /* Reset buf_ptr to beginning.                   */
-        cli_print(cli, cli_prompt); /* Print the CLI prompt to the user.             */
-        break;
-
-    case '\b':
-        /* Backspace. Delete character. */
-        if(buf_ptr > buf)
-            buf_ptr--;
+        *rx_data.buf_ptr = '\0';             /* Terminate the msg and reset the msg ptr.      */
+        rx_data.buf_ptr = rx_data.buf;
+        cli_print(cli, cli_prompt);         /* Print the CLI prompt to the user.             */
+        rx_data.is_ready = true;
+        rx_data.buf_length = 0;
         break;
 
     default:
+        /* If we have never received anything, let's clear the buffer to have a fresh start */
+        if(rx_data.buf_length == 0)
+        {
+            memset(rx_data.buf, 0,sizeof(rx_data.buf));
+        }
         /* Normal character received, add to buffer. */
-        if((buf_ptr - buf) < MAX_BUF_SIZE)
-            *buf_ptr++ = c;
+        if((rx_data.buf_ptr - rx_data.buf) < MAX_BUF_SIZE)
+        {
+            *rx_data.buf_ptr++ = c;
+            rx_data.buf_length++;
+        }
         else
+        {
             return CLI_E_BUF_FULL;
+        }
         break;
     }
+    return CLI_OK;
 }
 
 /*!
@@ -150,7 +163,7 @@ cli_status_t cli_put(cli_t *cli, char c)
 static void cli_print(cli_t *cli, const char *msg)
 {
     /* Temp buffer to store text in ram first */
-    char buf[50];
+    char buf[MAX_BUF_SIZE];
 
     strcpy(buf, msg);
     cli->println(buf);
