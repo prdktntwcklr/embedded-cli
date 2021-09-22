@@ -3,7 +3,7 @@ CFLAGS=-I.
 
 ODIR=out
 
-DEPS = cli.h cli_defs.h
+DEPS = ../src/cli.h ../src/cli_defs.h
 
 
 _OBJ = main.o cli.o 

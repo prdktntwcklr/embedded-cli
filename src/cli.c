@@ -87,7 +87,7 @@ cli_status_t cli_process(cli_t *cli)
 
     if(rx_data.is_ready == false)
     {
-        return CLI_E_CMD_NOT_FOUND;
+        return CLI_E_CMD_NOT_READY;
     }
 
     rx_data.is_ready = false;
@@ -114,6 +114,7 @@ cli_status_t cli_process(cli_t *cli)
 
     /* Command not found */
     rx_data.buf_length = 0;
+    rx_data.is_ready = false;
     memset(rx_data.buf, 0,sizeof(rx_data.buf));
     cli_print(cli, cli_unrecog);
     return CLI_E_CMD_NOT_FOUND;
@@ -127,32 +128,34 @@ cli_status_t cli_put(cli_t *cli, char c)
 {
     switch(c)
     {
-    case CMD_TERMINATOR:
-        
-        *rx_data.buf_ptr = '\0';             /* Terminate the msg and reset the msg ptr.      */
-        rx_data.buf_ptr = rx_data.buf;
-        cli_print(cli, cli_prompt);         /* Print the CLI prompt to the user.             */
-        rx_data.is_ready = true;
-        rx_data.buf_length = 0;
-        break;
-
-    default:
-        /* If we have never received anything, let's clear the buffer to have a fresh start */
-        if(rx_data.buf_length == 0)
+        case CMD_TERMINATOR:
         {
-            memset(rx_data.buf, 0,sizeof(rx_data.buf));
+            *rx_data.buf_ptr = '\0';             /* Terminate the msg and reset the msg ptr.      */
+            rx_data.buf_ptr = rx_data.buf;
+            cli_print(cli, cli_prompt);         /* Print the CLI prompt to the user.             */
+            rx_data.is_ready = true;
+            rx_data.buf_length = 0;
+            break;
         }
-        /* Normal character received, add to buffer. */
-        if((rx_data.buf_ptr - rx_data.buf) < MAX_BUF_SIZE)
+        default:
         {
-            *rx_data.buf_ptr++ = c;
-            rx_data.buf_length++;
+            /* If we have never received anything, let's clear the buffer to have a fresh start */
+            if(rx_data.buf_length == 0)
+            {
+                memset(rx_data.buf, 0,sizeof(rx_data.buf));
+            }
+            /* Normal character received, add to buffer. */
+            if((rx_data.buf_ptr - rx_data.buf) < MAX_BUF_SIZE)
+            {
+                *rx_data.buf_ptr++ = c;
+                rx_data.buf_length++;
+            }
+            else
+            {
+                return CLI_E_BUF_FULL;
+            }
+            break;
         }
-        else
-        {
-            return CLI_E_BUF_FULL;
-        }
-        break;
     }
     return CLI_OK;
 }
