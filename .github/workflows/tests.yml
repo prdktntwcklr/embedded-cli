@@ -1,0 +1,29 @@
+# syntax for this file https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+# help on github actions: https://docs.github.com/en/actions/learn-github-actions/introduction-to-github-actions
+name: CI
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+
+    container:
+      image: throwtheswitch/madsciencelab
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run ceedling unit test suite
+        run: ceedling
+      - name: Run test coverage report
+        run: ceedling gcov:all utils:gcov
