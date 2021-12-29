@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define MAX_BUF_SIZE        128     /* Maximum size of CLI Rx buffer */ 
+#define MAX_BUF_SIZE        256     /* Maximum size of CLI Rx buffer */ 
 #define MAX_ARGS            30
 #define CMD_TERMINATOR      '\n'    /* Delimitor denoting end of cmd */
 
