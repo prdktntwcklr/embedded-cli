@@ -37,8 +37,8 @@
 
 rx_data_t rx_data;
 
-const char cli_prompt[] = ">> ";                    /* CLI prompt displayed to the user */
-const char cli_ready[] = "<< cli ready\n";          /* CLI prompt displayed to the user */
+//const char cli_prompt[] = ">> ";                    /* CLI prompt displayed to the user */
+//const char cli_ready[] = "<< cli ready\n";          /* CLI prompt displayed to the user */
 const char cli_unrecog[] = "CMD: Command not recognized\n";
 const char *cli_error_msg[] = {
     "OK",
@@ -63,7 +63,7 @@ cli_status_t cli_init(cli_t *cli)
     rx_data.buf_ptr = rx_data.buf;
 
     /* Print the CLI ready prompt. */
-    cli_print(cli, cli_ready);
+    //cli_print(cli, cli_ready);
 
     return CLI_OK;
 }
@@ -132,7 +132,7 @@ cli_status_t cli_put(cli_t *cli, char c)
         {
             *rx_data.buf_ptr = '\0';             /* Terminate the msg and reset the msg ptr.      */
             rx_data.buf_ptr = rx_data.buf;
-            cli_print(cli, cli_prompt);         /* Print the CLI prompt to the user.             */
+            //cli_print(cli, cli_prompt);         /* Print the CLI prompt to the user.             */
             rx_data.is_ready = true;
             rx_data.buf_length = 0;
             break;
