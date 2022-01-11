@@ -39,11 +39,11 @@ rx_data_t rx_data;
 
 //const char cli_prompt[] = ">> ";                    /* CLI prompt displayed to the user */
 //const char cli_ready[] = "<< cli ready\n";          /* CLI prompt displayed to the user */
-const char cli_unrecog[] = "CMD: Command not recognized\n";
-const char *cli_error_msg[] = {
-    "OK",
-    "Command not recognized"
-};
+const char cli_unrecog[] = "CLI Error: Command not recognized\r\n";
+// const char *cli_error_msg[] = {
+//     "OK",
+//     "Command not recognized"
+// };
 
 
 /*!
