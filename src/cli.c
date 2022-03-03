@@ -37,14 +37,7 @@
 
 rx_data_t rx_data;
 
-//const char cli_prompt[] = ">> ";                    /* CLI prompt displayed to the user */
-//const char cli_ready[] = "<< cli ready\n";          /* CLI prompt displayed to the user */
 const char cli_unrecog[] = "CLI Error: Command not recognized\r\n";
-// const char *cli_error_msg[] = {
-//     "OK",
-//     "Command not recognized"
-// };
-
 
 /*!
  * @brief This internal API prints a message to the user on the CLI.
@@ -54,17 +47,14 @@ static void cli_print(cli_t *cli, const char *msg);
 /*!
  * @brief This API initialises the command-line interface.
  */
-cli_status_t cli_init(cli_t *cli)
+cli_status_t cli_init(cli_t *cli, uint8_t *rx_buf_ptr, uint16_t rx_buf_size)
 {
     /* Reset buffer */
-    memset(rx_data.buf, 0, sizeof(rx_data.buf));
-    rx_data.buf_length = 0;
+    //memset(rx_data.buf_ptr, 0, rx_data.buf_size);
+    rx_data.current_buf_length = 0;
     rx_data.is_ready = false;
-    rx_data.buf_ptr = rx_data.buf;
-
-    /* Print the CLI ready prompt. */
-    //cli_print(cli, cli_ready);
-
+    rx_data.buf_ptr = rx_buf_ptr;
+    rx_data.buf_size = rx_buf_size;
     return CLI_OK;
 }
 
@@ -93,7 +83,7 @@ cli_status_t cli_process(cli_t *cli)
     rx_data.is_ready = false;
 
     /* Get the first token (cmd name) */
-    argv[argc] = strtok((char *)rx_data.buf, " ");
+    argv[argc] = strtok((char *)rx_data.buf_ptr, " ");
 
     /* Walk through the other tokens (parameters) */
     while((argv[argc] != NULL) && (argc < MAX_ARGS))
@@ -113,9 +103,9 @@ cli_status_t cli_process(cli_t *cli)
     }
 
     /* Command not found */
-    rx_data.buf_length = 0;
+    rx_data.current_buf_length = 0;
     rx_data.is_ready = false;
-    memset(rx_data.buf, 0,sizeof(rx_data.buf));
+    memset(rx_data.buf_ptr, 0, rx_data.buf_size);
     cli_print(cli, cli_unrecog);
     return CLI_E_CMD_NOT_FOUND;
 }
@@ -130,25 +120,25 @@ cli_status_t cli_put(cli_t *cli, char c)
     {
         case CMD_TERMINATOR:
         {
-            *rx_data.buf_ptr = '\0';             /* Terminate the msg and reset the msg ptr.      */
-            rx_data.buf_ptr = rx_data.buf;
-            //cli_print(cli, cli_prompt);         /* Print the CLI prompt to the user.             */
+            /* Terminate the msg and reset the msg ptr by subtracting the length. This should put us back at the begining of the array  */
+            *rx_data.buf_ptr = '\0';             
+            rx_data.buf_ptr -= rx_data.current_buf_length;
             rx_data.is_ready = true;
-            rx_data.buf_length = 0;
+            rx_data.current_buf_length = 0;
             break;
         }
         default:
         {
             /* If we have never received anything, let's clear the buffer to have a fresh start */
-            if(rx_data.buf_length == 0)
+            if(rx_data.current_buf_length == 0)
             {
-                memset(rx_data.buf, 0,sizeof(rx_data.buf));
+                memset(rx_data.buf_ptr, 0, rx_data.buf_size);
             }
             /* Normal character received, add to buffer. */
-            if((rx_data.buf_ptr - rx_data.buf) < MAX_BUF_SIZE)
+            if(rx_data.current_buf_length < rx_data.buf_size)
             {
                 *rx_data.buf_ptr++ = c;
-                rx_data.buf_length++;
+                rx_data.current_buf_length++;
             }
             else
             {
@@ -165,9 +155,5 @@ cli_status_t cli_put(cli_t *cli, char c)
  */
 static void cli_print(cli_t *cli, const char *msg)
 {
-    /* Temp buffer to store text in ram first */
-    char buf[MAX_BUF_SIZE];
-
-    strcpy(buf, msg);
-    cli->println(buf);
+    cli->println(msg);
 }

@@ -51,7 +51,7 @@ extern "C" {
  * 
  * @return cli_status_t
  */
-cli_status_t cli_init(cli_t *cli);
+cli_status_t cli_init(cli_t *cli, uint8_t *rx_buf_ptr, uint16_t rx_buf_size);
 
 /*!
  * @brief This API deinitialises the command-line interface.

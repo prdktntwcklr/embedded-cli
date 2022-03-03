@@ -2,3 +2,8 @@
 *.o
 */out 
 /build 
+/CMakeFiles
+/cmake_build
+Makefile
+cmake_install.cmake
+CMakeCache.txt

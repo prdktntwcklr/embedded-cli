@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define MAX_BUF_SIZE        256     /* Maximum size of CLI Rx buffer */ 
 #define MAX_ARGS            30
 #define CMD_TERMINATOR      '\n'    /* Delimitor denoting end of cmd */
 
@@ -50,9 +49,9 @@ typedef struct
  */
 typedef struct
 {
-    uint8_t buf[MAX_BUF_SIZE];      /* CLI Rx byte-buffer */
     uint8_t *buf_ptr;               /* Pointer to Rx byte-buffer */
-    uint8_t buf_length;             /* Length of buffer */
+    uint16_t buf_size;              /* Size of buffer */
+    uint16_t current_buf_length;    /* Current length of buffer */
     bool is_ready;                  /* Is a command fully received and ready to be processed */
 } rx_data_t;
 

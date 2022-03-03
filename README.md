@@ -114,6 +114,19 @@ cli_status_t echo_func(int argc, char **argv)
 ```
 
 ## Building
-The example main.c file is used by the make file to build. Confirm gcc/make is installed. Then simply run `make` and the program will be compiled.  
-You can run the program by running `./cli`   
-You will see a prompt for the cli and can send commands. 
+The example main.c file is used by the make file to build. Confirm cmake is installed.   
+From project root directory run:  
+``` 
+cmake .  
+``` 
+This will initialize the repo for cmake.  
+Then to build run:  
+``` 
+cmake --build . 
+``` 
+This will generate the executable `CLI_Example` in the `cmake_build` directory. This can be run with the command: 
+``` 
+./cmake_build/CLI_Example 
+``` 
+You should see the prompt `Welcome to the cli. Type 'help' to get a list of commands.`  
+ 

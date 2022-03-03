@@ -10,6 +10,7 @@
 static cli_status_t help_func(int argc, char **argv);
 static cli_status_t gpio_func(int argc, char **argv);
 static cli_status_t adc_func(int argc, char **argv);
+static uint8_t cli_buffer[256] = {0};
 
 cmd_t cmd_tbl[3] = {
     {
@@ -51,7 +52,7 @@ cli_status_t gpio_func(int argc, char **argv)
     }
     else
     {
-        cli.println("missing arguments");
+        cli.println("missing arguments\n");
     }
     return ok;
 }
@@ -59,16 +60,18 @@ cli_status_t gpio_func(int argc, char **argv)
 cli_status_t adc_func(int argc, char **argv)
 {
     cli_status_t ok = CLI_OK;
-    if(strcmp(argv[1], "-sample_channel") == 0 && argc == 3)
+    if(argc == 3)
     {
-        int channel = atoi(argv[2]);
-        cli.println("[cli] adc sample channel %d\n", channel);
+        if(strcmp(argv[1], "-sample_channel") == 0 && argc == 3)
+        {
+            int channel = atoi(argv[2]);
+            cli.println("[cli] adc sample channel %d\n", channel);
+            return ok;
+        }
     }
-    else
-    {
-        cli.println("missing arguments");
-    }
-    return ok;
+    
+    cli.println("missing arguments\n");
+    return CLI_E_INVALID_ARGS;
 }
 
 void user_uart_println(const char * format, ...)
@@ -85,7 +88,9 @@ int main(void)
     cli.cmd_tbl = cmd_tbl;
     cli.cmd_cnt = sizeof(cmd_tbl)/sizeof(cmd_t);
 
-    if((rslt = cli_init(&cli)) != CLI_OK)
+    printf("Welcome to the cli. Type 'help' to get a list of commands.\n");
+
+    if((rslt = cli_init(&cli, cli_buffer, sizeof(cli_buffer))) != CLI_OK)
     {
         printf("CLI: Failed to initialise");
     }
