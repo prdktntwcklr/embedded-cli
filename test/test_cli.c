@@ -1,33 +1,24 @@
+#ifdef TEST
+
 #include "unity.h"
 
 #include "cli.h"
-#include "cli_defs.h"
+#include "fake_printf.h"
 
 #include <stdarg.h>
 
 static cli_status_t help_func(int argc, char **argv);
-static cli_status_t gpio_func(int argc, char **argv);
-static cli_status_t adc_func(int argc, char **argv);
-static cli_status_t big_func(int argc, char **argv);
+static cli_status_t args_func(int argc, char **argv);
 static uint8_t cli_buffer[256] = {0};
-static char test_buffer[256] = {0};
 
-cmd_t cmd_tbl[4] = {
+cmd_t cmd_tbl[2] = {
     {
         .cmd = "help",
         .func = help_func,
     },
     {
-        .cmd = "gpio",
-        .func = gpio_func,
-    },
-    {
-        .cmd = "adc",
-        .func = adc_func,
-    },
-    {
-        .cmd = "big",
-        .func = big_func,
+        .cmd = "args",
+        .func = args_func,
     },
 };
 
@@ -35,131 +26,156 @@ cli_t cli;
 
 cli_status_t help_func(int argc, char **argv)
 {
-    cli_status_t ok = CLI_OK;
-    cli.println("[cli] CLI HELP. Available commands:\n  gpio (-set or -get)\n  "
-                "adc (get_sample)\n\n");
-    return ok;
+    cli.println("cli help func called\n");
+    return CLI_OK;
 }
 
-cli_status_t gpio_func(int argc, char **argv)
+cli_status_t args_func(int argc, char **argv)
 {
-    cli_status_t ok = CLI_OK;
-    cli.println("[cli] gpio [need to implement]\n");
-    return ok;
-}
+    cli.println("cli args func called with %d args:", argc);
 
-cli_status_t adc_func(int argc, char **argv)
-{
-    cli_status_t ok = CLI_OK;
-    cli.println("[cli] adc [need to implement]\n");
-    return ok;
-}
+    for(int i = 1; i < argc; i++)
+    {
+        cli.println(" %s", argv[i]);
+    }
 
-static cli_status_t big_func(int argc, char **argv)
-{
-    cli_status_t ok = CLI_OK;
-    // 212 characters
-    cli.println("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCD"
-                "EF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789AB"
-                "CDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789"
-                "ABCDEF0123456789ABCDEF-END\n");
-    return ok;
-}
+    cli.println("\n");
 
-void user_uart_println(const char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    vprintf(format, args);
-    vsprintf(test_buffer, format, args);
-    va_end(args);
+    return CLI_OK;
 }
 
 void setUp(void)
 {
     cli_status_t cli_result = CLI_MAX_STATUS;
-    cli.println = user_uart_println;
+    cli.println = fake_printf;
     cli.cmd_tbl = cmd_tbl;
-    cli.cmd_cnt = sizeof(cmd_tbl) / sizeof(cmd_t);
-    if((cli_result = cli_init(&cli, cli_buffer, sizeof(cli_buffer))) != CLI_OK)
+    cli.cmd_cnt = (sizeof(cmd_tbl) / sizeof(cmd_t));
+
+    cli_result = cli_init(&cli, cli_buffer, sizeof(cli_buffer));
+
+    if(cli_result != CLI_OK)
     {
-        printf("CLI: Failed to initialise");
-        TEST_FAIL();
+        TEST_FAIL_MESSAGE("CLI failed to initialize.");
     }
+
+    TEST_ASSERT_EQUAL_STRING("cli_init() ok.\n",
+                             fake_printf_get_last_message());
+
+    fake_printf_reset();
 }
 
-void tearDown(void) {}
-
-void test_cli_cmd_help(void)
+void tearDown(void)
 {
-    char cmd[] = {'h', 'e', 'l', 'p', '\n'};
-    for(int i = 0; i < sizeof(cmd); i++)
-    {
-        cli_put(&cli, cmd[i]);
-    }
-    cli_status_t result = cli_process(&cli);
-    TEST_ASSERT_EQUAL_INT(CLI_OK, result);
+    fake_printf_delete_file();
 }
 
-void test_cli_cmd_gpio(void)
-{
-    char cmd[] = {'g', 'p', 'i', 'o', '\n'};
-    for(int i = 0; i < sizeof(cmd); i++)
-    {
-        cli_put(&cli, cmd[i]);
-    }
-    cli_status_t result = cli_process(&cli);
-    TEST_ASSERT_EQUAL_INT(CLI_OK, result);
-}
-
-void test_cli_cmd_adc(void)
-{
-    char cmd[] = {'a', 'd', 'c', '\n'};
-    for(int i = 0; i < sizeof(cmd); i++)
-    {
-        cli_put(&cli, cmd[i]);
-    }
-    cli_status_t result = cli_process(&cli);
-    TEST_ASSERT_EQUAL_INT(CLI_OK, result);
-}
-
-void test_cli_cmd_bad(void)
-{
-    char cmd[] = {'n', 'o', '\n'};
-    for(int i = 0; i < sizeof(cmd); i++)
-    {
-        cli_put(&cli, cmd[i]);
-    }
-    cli_status_t result = cli_process(&cli);
-    TEST_ASSERT_EQUAL_INT(CLI_E_CMD_NOT_FOUND, result);
-}
-
-void test_cli_cmd_no_terminator(void)
+void test_cli_put_should_addCharacterToBuffer(void)
 {
     char cmd[] = {'h', 'e', 'l', 'p'};
+
+    TEST_ASSERT_EQUAL(0, cli_buffer[0]);
+    TEST_ASSERT_EQUAL(0, cli_buffer[1]);
+    TEST_ASSERT_EQUAL(0, cli_buffer[2]);
+    TEST_ASSERT_EQUAL(0, cli_buffer[3]);
+    TEST_ASSERT_EQUAL(0, cli_buffer[4]);
+
     for(int i = 0; i < sizeof(cmd); i++)
     {
         cli_put(&cli, cmd[i]);
     }
+
+    TEST_ASSERT_EQUAL('h', cli_buffer[0]);
+    TEST_ASSERT_EQUAL('e', cli_buffer[1]);
+    TEST_ASSERT_EQUAL('l', cli_buffer[2]);
+    TEST_ASSERT_EQUAL('p', cli_buffer[3]);
+    TEST_ASSERT_EQUAL(0, cli_buffer[5]);
+}
+
+void test_cli_put_should_returnFullIfBufferIsFull(void)
+{
+    for(int i = 0; i < 256; i++)
+    {
+        TEST_ASSERT_EQUAL(CLI_OK, cli_put(&cli, 'a'));
+    }
+
+    TEST_ASSERT_EQUAL(CLI_E_BUF_FULL, cli_put(&cli, 'a'));
+
+    /* sending terminator when buffer is full should work */
+    TEST_ASSERT_EQUAL(CLI_OK, cli_put(&cli, '\n'));
+
+    /* buffer should no longer be full */
+    TEST_ASSERT_EQUAL(CLI_OK, cli_put(&cli, 'a'));
+}
+
+void test_cli_process_should_returnNotReadyIfNoTerminatorFound(void)
+{
+    char cmd[] = {'h', 'e', 'l', 'p'};
+
+    for(int i = 0; i < sizeof(cmd); i++)
+    {
+        cli_put(&cli, cmd[i]);
+    }
+
     cli_status_t result = cli_process(&cli);
+
     TEST_ASSERT_EQUAL_INT(CLI_E_CMD_NOT_READY, result);
 
     cli_put(&cli, '\n');
     result = cli_process(&cli);
+
     TEST_ASSERT_EQUAL_INT(CLI_OK, result);
 }
 
-void test_cli_cmd_big(void)
+void test_cli_process_should_returnNotFoundIfUnknownCommand(void)
 {
-    char cmd[] = {'b', 'i', 'g', '\n'};
+    char cmd[] = {'n', 'o', '\n'};
+
     for(int i = 0; i < sizeof(cmd); i++)
     {
         cli_put(&cli, cmd[i]);
     }
 
     cli_status_t result = cli_process(&cli);
+
+    TEST_ASSERT_EQUAL_INT(CLI_E_CMD_NOT_FOUND, result);
+
+    TEST_ASSERT_EQUAL_STRING("CLI ERROR: Command not recognized\n",
+                             fake_printf_get_last_message());
+}
+
+void test_cli_process_should_callHelpIfHelpCmdReceived(void)
+{
+    char cmd[] = {'h', 'e', 'l', 'p', '\n'};
+
+    for(int i = 0; i < sizeof(cmd); i++)
+    {
+        cli_put(&cli, cmd[i]);
+    }
+
+    cli_status_t result = cli_process(&cli);
+
     TEST_ASSERT_EQUAL_INT(CLI_OK, result);
 
-    // Make sure we get all the way to the end
-    TEST_ASSERT_EQUAL_UINT8('D', test_buffer[211]);
+    TEST_ASSERT_EQUAL_STRING("cli help func called\n",
+                             fake_printf_get_last_message());
 }
+
+void test_cli_process_should_callArgsWithArgsIfArgsCmdReceived(void)
+{
+    char cmd[] = {'a', 'r', 'g', 's', ' ', 'a', 'r', 'g',
+                  '1', ' ', 'p', 'a', 'r', '2', '\n'};
+
+    for(int i = 0; i < sizeof(cmd); i++)
+    {
+        cli_put(&cli, cmd[i]);
+    }
+
+    cli_status_t result = cli_process(&cli);
+
+    TEST_ASSERT_EQUAL_INT(CLI_OK, result);
+
+    TEST_ASSERT_EQUAL_STRING("cli args func called with 3 args: arg1 par2\n",
+                             fake_printf_get_last_message());
+}
+
+#endif /* TEST */
