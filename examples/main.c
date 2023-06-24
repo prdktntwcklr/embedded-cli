@@ -1,4 +1,4 @@
-#include "../src/cli.h"
+#include "cli.h"
 
 #include <stdlib.h>
 #include <stdbool.h>

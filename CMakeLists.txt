@@ -1,16 +1,13 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
-# Set the output directories, this... mostly works
-set(cmake_build "cmake_build/")
-set(EXECUTABLE_OUTPUT_PATH ${cmake_build})
-set(CMAKE_BUILD_FILES_DIRECTORY ${cmake_build})
-set(CMAKE_BUILD_DIRECTORY ${cmake_build})
+# declare the project
+project(cli_example)
 
-# Declare the project
-project(CLI)
+# create a SRC_FILES variable with a link to all c files to compile
+set(SRC_FILES src/cli.c)
 
-# Get the source files from the src/ dir
-file(GLOB_RECURSE SRC_FILES src/*.c)
+# get the main file from the example/ dir and create executable
+add_executable(cli_example examples/main.c ${SRC_FILES})
 
-# Get the main file from the example/ dir and create executable
-add_executable(CLI_Example examples/main.c ${SRC_FILES})
+# set the directories that should be included in the build command for this target
+target_include_directories(cli_example PRIVATE src)

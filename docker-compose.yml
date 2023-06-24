@@ -1,0 +1,26 @@
+services:
+  build-image:
+    image: cli-embedded
+    command: bash -c "echo build-image completed."
+    build: .
+  build-project:
+    image: cli-embedded
+    command: bash -c "cmake --version && cmake -B build/ && cmake --build build/"
+    depends_on:
+    - build-image
+    volumes:
+    - ./:/app
+  unit-tests:
+    image: cli-embedded
+    command: bash -c "ceedling version && ceedling clobber && ceedling test:all"
+    depends_on:
+    - build-image
+    volumes:
+    - ./:/app
+  code-coverage:
+    image: cli-embedded
+    command: bash -c "ceedling version && ceedling gcov:all utils:gcov"
+    depends_on:
+    - build-image
+    volumes:
+    - ./:/app
