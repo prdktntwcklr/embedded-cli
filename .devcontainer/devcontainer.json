@@ -1,0 +1,19 @@
+{
+    "name": "Embedded CLI Development",
+    "dockerFile": "../Dockerfile",
+    "runArgs": [
+        "--security-opt",
+        "label=disable"
+    ],
+    "containerEnv": {
+        "WORKSPACE_DIR": "${containerWorkspaceFolder}",
+        "PROMPT_COMMAND": "history -a"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools"
+            ]
+        }
+    }
+}

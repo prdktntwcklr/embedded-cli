@@ -71,6 +71,7 @@
 :gcov:
   :reports:
     - HtmlDetailed
+    - Text
   :gcovr:
     :html_medium_threshold: 75
     :html_high_threshold: 90
