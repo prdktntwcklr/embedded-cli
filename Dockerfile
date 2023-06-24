@@ -9,7 +9,8 @@ RUN ln -snf /usr/share/zoneinfo/$CONTAINER_TIMEZONE /etc/localtime && \
 
 # update package information and install required packages
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y build-essential cmake gcovr ruby && \
+    apt-get install --no-install-recommends -y build-essential clang-format cmake gcovr git python3 python3-pip ruby && \
+    pip install --no-cache-dir pre-commit && \
     gem install ceedling
 
 # clean up stale packages

@@ -13,7 +13,11 @@
         "vscode": {
             "extensions": [
                 "ms-vscode.cpptools"
-            ]
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash"
+            }
         }
-    }
+    },
+    "postStartCommand": "pre-commit --version && pre-commit install"
 }

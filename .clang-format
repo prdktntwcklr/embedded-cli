@@ -1,0 +1,7 @@
+BasedOnStyle: LLVM
+AlignConsecutiveMacros: AcrossEmptyLines
+AllowShortFunctionsOnASingleLine: Empty
+BreakBeforeBraces: Allman
+IndentCaseLabels: true
+IndentWidth: 4
+SpaceBeforeParens: Never
