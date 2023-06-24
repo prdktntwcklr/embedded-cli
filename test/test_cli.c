@@ -15,20 +15,20 @@ static char test_buffer[256] = {0};
 cmd_t cmd_tbl[4] = {
     {
         .cmd = "help",
-        .func = help_func
+        .func = help_func,
     },
     {
         .cmd = "gpio",
-        .func = gpio_func
+        .func = gpio_func,
     },
     {
         .cmd = "adc",
-        .func = adc_func
+        .func = adc_func,
     },
     {
         .cmd = "big",
-        .func = big_func
-    }
+        .func = big_func,
+    },
 };
 
 cli_t cli;
@@ -36,7 +36,8 @@ cli_t cli;
 cli_status_t help_func(int argc, char **argv)
 {
     cli_status_t ok = CLI_OK;
-    cli.println("[cli] CLI HELP. Available commands:\n  gpio (-set or -get)\n  adc (get_sample)\n\n");
+    cli.println("[cli] CLI HELP. Available commands:\n  gpio (-set or -get)\n  "
+                "adc (get_sample)\n\n");
     return ok;
 }
 
@@ -58,25 +59,28 @@ static cli_status_t big_func(int argc, char **argv)
 {
     cli_status_t ok = CLI_OK;
     // 212 characters
-    cli.println("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF-END\n");
+    cli.println("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCD"
+                "EF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789AB"
+                "CDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789"
+                "ABCDEF0123456789ABCDEF-END\n");
     return ok;
 }
 
-void user_uart_println(const char * format, ...)
+void user_uart_println(const char *format, ...)
 {
     va_list args;
-    va_start (args, format);
-    vprintf (format, args);
+    va_start(args, format);
+    vprintf(format, args);
     vsprintf(test_buffer, format, args);
-    va_end (args);
+    va_end(args);
 }
 
 void setUp(void)
 {
-    cli_status_t cli_result = CLI_E_IO;
+    cli_status_t cli_result = CLI_MAX_STATUS;
     cli.println = user_uart_println;
     cli.cmd_tbl = cmd_tbl;
-    cli.cmd_cnt = sizeof(cmd_tbl)/sizeof(cmd_t);
+    cli.cmd_cnt = sizeof(cmd_tbl) / sizeof(cmd_t);
     if((cli_result = cli_init(&cli, cli_buffer, sizeof(cli_buffer))) != CLI_OK)
     {
         printf("CLI: Failed to initialise");
@@ -84,9 +88,7 @@ void setUp(void)
     }
 }
 
-void tearDown(void)
-{
-}
+void tearDown(void) {}
 
 void test_cli_cmd_help(void)
 {

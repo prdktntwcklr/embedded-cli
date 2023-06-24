@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2019 Sean Farrelly
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -46,7 +46,6 @@ static void cli_print(cli_t *cli, const char *msg);
 cli_status_t cli_init(cli_t *cli, uint8_t *rx_buf_ptr, uint16_t rx_buf_size)
 {
     /* Reset buffer */
-    //memset(rx_data.buf_ptr, 0, rx_data.buf_size);
     rx_data.current_buf_length = 0;
     rx_data.is_ready = false;
     rx_data.buf_ptr = rx_buf_ptr;
@@ -62,9 +61,8 @@ cli_status_t cli_deinit(cli_t *cli)
     return CLI_OK;
 }
 
-
-/*! @brief This API must be periodically called by the user to process and execute
- *         any commands received.
+/*! @brief This API must be periodically called by the user to process and
+ * execute any commands received.
  */
 cli_status_t cli_process(cli_t *cli)
 {
@@ -86,10 +84,10 @@ cli_status_t cli_process(cli_t *cli)
     {
         argv[++argc] = strtok(NULL, " ");
     }
-    
-    /* Search the command table for a matching command, using argv[0]
-     * which is the command name. */
-    for(size_t i = 0 ; i < cli->cmd_cnt ; i++)
+
+    /* Search the command table for a matching command, using argv[0] which is
+     * the command name. */
+    for(size_t i = 0; i < cli->cmd_cnt; i++)
     {
         if(strcmp(argv[0], cli->cmd_tbl[i].cmd) == 0)
         {
@@ -107,8 +105,8 @@ cli_status_t cli_process(cli_t *cli)
 }
 
 /*!
- * @brief This API should be called from the devices interrupt handler whenever a
- *        character is received over the input stream.
+ * @brief This API should be called from the devices interrupt handler whenever
+ *        a character is received over the input stream.
  */
 cli_status_t cli_put(cli_t *cli, char c)
 {
@@ -116,8 +114,9 @@ cli_status_t cli_put(cli_t *cli, char c)
     {
         case CMD_TERMINATOR:
         {
-            /* Terminate the msg and reset the msg ptr by subtracting the length. This should put us back at the begining of the array  */
-            *rx_data.buf_ptr = '\0';             
+            /* Terminate the msg and reset the msg ptr by subtracting the
+             * length. This should put us back at the begining of the array  */
+            *rx_data.buf_ptr = '\0';
             rx_data.buf_ptr -= rx_data.current_buf_length;
             rx_data.is_ready = true;
             rx_data.current_buf_length = 0;
@@ -125,11 +124,13 @@ cli_status_t cli_put(cli_t *cli, char c)
         }
         default:
         {
-            /* If we have never received anything, let's clear the buffer to have a fresh start */
+            /* If we have never received anything, let's clear the buffer to
+             * have a fresh start */
             if(rx_data.current_buf_length == 0)
             {
                 memset(rx_data.buf_ptr, 0, rx_data.buf_size);
             }
+
             /* Normal character received, add to buffer. */
             if(rx_data.current_buf_length < rx_data.buf_size)
             {
@@ -140,6 +141,7 @@ cli_status_t cli_put(cli_t *cli, char c)
             {
                 return CLI_E_BUF_FULL;
             }
+
             break;
         }
     }

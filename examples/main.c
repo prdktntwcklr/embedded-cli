@@ -1,11 +1,11 @@
 #include "cli.h"
 
-#include <stdlib.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 
 static cli_status_t help_func(int argc, char **argv);
 static cli_status_t gpio_func(int argc, char **argv);
@@ -15,16 +15,16 @@ static uint8_t cli_buffer[256] = {0};
 cmd_t cmd_tbl[3] = {
     {
         .cmd = "help",
-        .func = help_func
+        .func = help_func,
     },
     {
         .cmd = "gpio",
-        .func = gpio_func
+        .func = gpio_func,
     },
     {
         .cmd = "adc",
-        .func = adc_func
-    }
+        .func = adc_func,
+    },
 };
 cli_t cli;
 cli_status_t rslt = CLI_OK;
@@ -32,7 +32,8 @@ cli_status_t rslt = CLI_OK;
 cli_status_t help_func(int argc, char **argv)
 {
     cli_status_t ok = CLI_OK;
-    cli.println("[cli] CLI HELP. Available commands:\n  gpio (-set or -get)\n  adc (get_sample)\n\n");
+    cli.println("[cli] CLI HELP. Available commands:\n  gpio (-set or -get)\n  "
+                "adc (get_sample)\n\n");
     return ok;
 }
 
@@ -69,24 +70,24 @@ cli_status_t adc_func(int argc, char **argv)
             return ok;
         }
     }
-    
+
     cli.println("missing arguments\n");
     return CLI_E_INVALID_ARGS;
 }
 
-void user_uart_println(const char * format, ...)
+void user_uart_println(const char *format, ...)
 {
     va_list args;
-    va_start (args, format);
-    vprintf (format, args);
-    va_end (args);
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
 }
 
 int main(void)
 {
     cli.println = user_uart_println;
     cli.cmd_tbl = cmd_tbl;
-    cli.cmd_cnt = sizeof(cmd_tbl)/sizeof(cmd_t);
+    cli.cmd_cnt = sizeof(cmd_tbl) / sizeof(cmd_t);
 
     printf("Welcome to the cli. Type 'help' to get a list of commands.\n");
 
