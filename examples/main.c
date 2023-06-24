@@ -75,7 +75,7 @@ cli_status_t adc_func(int argc, char **argv)
     return CLI_E_INVALID_ARGS;
 }
 
-void user_uart_println(const char *format, ...)
+int user_uart_println(char *format, ...)
 {
     va_list args;
     va_start(args, format);

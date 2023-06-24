@@ -52,15 +52,6 @@ extern "C"
                           uint16_t rx_buf_size);
 
     /*!
-     * @brief This API deinitialises the command-line interface.
-     *
-     * @param[in] cli : Pointer to cli handle struct.
-     *
-     * @return cli_status_t
-     */
-    cli_status_t cli_deinit(cli_t *cli);
-
-    /*!
      * @brief This API must be periodically called by the user to process and
      * execute any commands received.
      *
