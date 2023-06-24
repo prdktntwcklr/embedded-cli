@@ -22,8 +22,9 @@ jobs:
       image: throwtheswitch/madsciencelab
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Run ceedling unit test suite
-        run: ceedling
-      - name: Run test coverage report
-        run: ceedling gcov:all utils:gcov
+      - name: checkout code
+        uses: actions/checkout@v3
+      - name: run unit tests
+        run:  ceedling clobber && ceedling test:all
+      - name: run test coverage report
+        run:  ceedling gcov:all utils:gcov
