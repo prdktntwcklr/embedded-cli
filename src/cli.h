@@ -21,10 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  * 
- * File        cli.h
- * Created by  Sean Farrelly
- * Version     1.0
- * 
  */
 
 /*! @file cli.h
