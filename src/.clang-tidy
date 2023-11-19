@@ -1,0 +1,10 @@
+Checks: '*,
+         -altera-struct-pack-align,
+         -altera-unroll-loops,
+         -clang-analyzer-core.NonNullParamChecker,
+         -clang-diagnostic-deprecated-declarations,
+         -concurrency-mt-unsafe,
+         -cppcoreguidelines-avoid-non-const-global-variables,
+         -llvm-header-guard,
+         -llvmlibc-restrict-system-libc-headers,
+         -modernize-macro-to-enum'

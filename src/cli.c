@@ -31,17 +31,25 @@
 #include <stdint.h>
 #include <string.h>
 
-static rx_data_t rx_data;
-
 static void cli_print(cli_t *cli, char *msg);
 
 cli_status_t cli_init(cli_t *cli, uint8_t *rx_buf_ptr, uint16_t rx_buf_size)
 {
+    if(rx_buf_ptr == NULL)
+    {
+        return CLI_E_NULL_PTR;
+    }
+
+    if(rx_buf_size == 0)
+    {
+        return CLI_E_INVALID_ARGS;
+    }
+
     /* Reset buffer */
-    rx_data.current_buf_length = 0;
-    rx_data.is_ready = false;
-    rx_data.buf_ptr = rx_buf_ptr;
-    rx_data.buf_size = rx_buf_size;
+    cli->rx_data.current_buf_length = 0;
+    cli->rx_data.is_ready = false;
+    cli->rx_data.buf_ptr = rx_buf_ptr;
+    cli->rx_data.buf_size = rx_buf_size;
 
     cli_print(cli, "cli_init() ok.\n");
 
@@ -53,15 +61,15 @@ cli_status_t cli_process(cli_t *cli)
     uint8_t argc = 0;
     char *argv[MAX_ARGS];
 
-    if(rx_data.is_ready == false)
+    if(cli->rx_data.is_ready == false)
     {
         return CLI_E_CMD_NOT_READY;
     }
 
-    rx_data.is_ready = false;
+    cli->rx_data.is_ready = false;
 
     /* Get the first token (cmd name) */
-    argv[argc] = strtok((char *)rx_data.buf_ptr, " ");
+    argv[0] = strtok((char *)cli->rx_data.buf_ptr, " ");
 
     /* Walk through the other tokens (parameters) */
     while((argv[argc] != NULL) && (argc < MAX_ARGS))
@@ -73,6 +81,7 @@ cli_status_t cli_process(cli_t *cli)
      * the command name. */
     for(size_t i = 0; i < cli->cmd_cnt; i++)
     {
+        /* NOLINTNEXTLINE(clang-analyzer-unix.cstring.NullArg) */
         if(strcmp(argv[0], cli->cmd_tbl[i].cmd) == 0)
         {
             /* Found a match, execute the associated function. */
@@ -81,42 +90,43 @@ cli_status_t cli_process(cli_t *cli)
     }
 
     /* Command not found */
-    rx_data.current_buf_length = 0;
-    rx_data.is_ready = false;
-    memset(rx_data.buf_ptr, 0, rx_data.buf_size);
+    cli->rx_data.current_buf_length = 0;
+    cli->rx_data.is_ready = false;
+    memset(cli->rx_data.buf_ptr, 0, cli->rx_data.buf_size);
     cli_print(cli, "CLI ERROR: Command not recognized\n");
 
     return CLI_E_CMD_NOT_FOUND;
 }
 
-cli_status_t cli_put(cli_t *cli, char c)
+cli_status_t cli_put(cli_t *cli, char character)
 {
-    switch(c)
+    /* NOLINTNEXTLINE(hicpp-multiway-paths-covered) */
+    switch(character)
     {
         case CMD_TERMINATOR:
         {
             /* Terminate the msg and reset the msg ptr by subtracting the
              * length. This should put us back at the begining of the array  */
-            *rx_data.buf_ptr = '\0';
-            rx_data.buf_ptr -= rx_data.current_buf_length;
-            rx_data.is_ready = true;
-            rx_data.current_buf_length = 0;
+            *cli->rx_data.buf_ptr = '\0';
+            cli->rx_data.buf_ptr -= cli->rx_data.current_buf_length;
+            cli->rx_data.is_ready = true;
+            cli->rx_data.current_buf_length = 0;
             break;
         }
         default:
         {
             /* If we have never received anything, let's clear the buffer to
              * have a fresh start */
-            if(rx_data.current_buf_length == 0)
+            if(cli->rx_data.current_buf_length == 0)
             {
-                memset(rx_data.buf_ptr, 0, rx_data.buf_size);
+                memset(cli->rx_data.buf_ptr, 0, cli->rx_data.buf_size);
             }
 
             /* Normal character received, add to buffer. */
-            if(rx_data.current_buf_length < rx_data.buf_size)
+            if(cli->rx_data.current_buf_length < cli->rx_data.buf_size)
             {
-                *rx_data.buf_ptr++ = c;
-                rx_data.current_buf_length++;
+                *cli->rx_data.buf_ptr++ = character;
+                cli->rx_data.current_buf_length++;
             }
             else
             {

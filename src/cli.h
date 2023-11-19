@@ -30,8 +30,8 @@
 /*!
  * @defgroup CLI API
  */
-#ifndef _CLI_H_
-#define _CLI_H_
+#ifndef CLI_H
+#define CLI_H
 
 /*! CPP guard */
 #ifdef __cplusplus
@@ -70,10 +70,10 @@ extern "C"
      *
      * @return cli_status_t
      */
-    cli_status_t cli_put(cli_t *cli, char c);
+    cli_status_t cli_put(cli_t *cli, char character);
 
 #ifdef __cplusplus
 }
 #endif /* End of CPP guard */
-#endif /* CLI_H_ */
+#endif /* CLI_H */
        /** @}*/

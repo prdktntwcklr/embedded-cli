@@ -6,6 +6,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # declare the project
 project(cli_example)
 
+set(CMAKE_C_STANDARD 99 CACHE STRING "The C standard to use")
+
 # create a SRC_FILES variable with a link to all c files to compile
 set(SRC_FILES src/cli.c)
 
