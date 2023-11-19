@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _CLI_DEFS_H_
-#define _CLI_DEFS_H_
+#ifndef CLI_DEFS_H
+#define CLI_DEFS_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -61,16 +61,6 @@ typedef struct
 } cmd_t;
 
 /*!
- * @brief Command-line interface handle structure.
- */
-typedef struct
-{
-    println_func_ptr_t println; /* Pointer to user defined println function.*/
-    cmd_t *cmd_tbl; /* Pointer to series of commands to be accepted. */
-    size_t cmd_cnt; /* Number of commands in cmd_tbl. */
-} cli_t;
-
-/*!
  * @brief Struct for holding received data
  */
 typedef struct
@@ -81,4 +71,15 @@ typedef struct
     bool is_ready; /* Command fully received and ready to be processed */
 } rx_data_t;
 
-#endif /* _CLI_DEFS_H_ */
+/*!
+ * @brief Command-line interface handle structure.
+ */
+typedef struct
+{
+    println_func_ptr_t println; /* Pointer to user defined println function.*/
+    cmd_t *cmd_tbl;    /* Pointer to series of commands to be accepted. */
+    size_t cmd_cnt;    /* Number of commands in cmd_tbl. */
+    rx_data_t rx_data; /* rx_data struct */
+} cli_t;
+
+#endif /* CLI_DEFS_H */

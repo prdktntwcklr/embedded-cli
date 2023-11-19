@@ -178,4 +178,32 @@ void test_cli_process_should_callArgsWithArgsIfArgsCmdReceived(void)
                              fake_printf_get_last_message());
 }
 
+void test_cli_init_should_failIfNullPointerPassed(void)
+{
+    cli_t bad_cli;
+
+    cli_status_t cli_result = CLI_MAX_STATUS;
+    bad_cli.println = fake_printf;
+    bad_cli.cmd_tbl = cmd_tbl;
+    bad_cli.cmd_cnt = (sizeof(cmd_tbl) / sizeof(cmd_t));
+
+    cli_result = cli_init(&bad_cli, NULL, sizeof(cli_buffer));
+
+    TEST_ASSERT_EQUAL(CLI_E_NULL_PTR, cli_result);
+}
+
+void test_cli_init_should_failIfBufSizeIsZero(void)
+{
+    cli_t bad_cli;
+
+    cli_status_t cli_result = CLI_MAX_STATUS;
+    bad_cli.println = fake_printf;
+    bad_cli.cmd_tbl = cmd_tbl;
+    bad_cli.cmd_cnt = (sizeof(cmd_tbl) / sizeof(cmd_t));
+
+    cli_result = cli_init(&bad_cli, cli_buffer, 0);
+
+    TEST_ASSERT_EQUAL(CLI_E_INVALID_ARGS, cli_result);
+}
+
 #endif /* TEST */

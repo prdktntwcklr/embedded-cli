@@ -32,8 +32,9 @@ cli_status_t rslt = CLI_OK;
 cli_status_t help_func(int argc, char **argv)
 {
     cli_status_t ok = CLI_OK;
-    cli.println("[cli] CLI HELP. Available commands:\n  gpio (-set or -get)\n  "
-                "adc (get_sample)\n\n");
+    cli.println("[cli] CLI HELP. Available commands:\n");
+    cli.println("  gpio (-set or -get)\n");
+    cli.println("  adc (get_sample)\n");
     return ok;
 }
 
@@ -89,12 +90,12 @@ int main(void)
     cli.cmd_tbl = cmd_tbl;
     cli.cmd_cnt = sizeof(cmd_tbl) / sizeof(cmd_t);
 
-    printf("Welcome to the cli. Type 'help' to get a list of commands.\n");
-
     if((rslt = cli_init(&cli, cli_buffer, sizeof(cli_buffer))) != CLI_OK)
     {
         printf("CLI: Failed to initialise");
     }
+
+    printf("Welcome to the cli. Type 'help' to get a list of commands.\n");
 
     while(1)
     {
