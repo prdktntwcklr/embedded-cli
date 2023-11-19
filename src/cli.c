@@ -71,6 +71,12 @@ cli_status_t cli_process(cli_t *cli)
     /* Get the first token (cmd name) */
     argv[0] = strtok((char *)cli->rx_data.buf_ptr, " ");
 
+    /* If we send an empty string, return command not found */
+    if(argv[0] == NULL)
+    {
+        return CLI_E_CMD_NOT_FOUND;
+    }
+
     /* Walk through the other tokens (parameters) */
     while((argv[argc] != NULL) && (argc < MAX_ARGS))
     {
@@ -81,7 +87,6 @@ cli_status_t cli_process(cli_t *cli)
      * the command name. */
     for(size_t i = 0; i < cli->cmd_cnt; i++)
     {
-        /* NOLINTNEXTLINE(clang-analyzer-unix.cstring.NullArg) */
         if(strcmp(argv[0], cli->cmd_tbl[i].cmd) == 0)
         {
             /* Found a match, execute the associated function. */

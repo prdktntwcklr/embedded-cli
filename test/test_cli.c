@@ -206,4 +206,17 @@ void test_cli_init_should_failIfBufSizeIsZero(void)
     TEST_ASSERT_EQUAL(CLI_E_INVALID_ARGS, cli_result);
 }
 
+void test_cli_process_should_returnNotFoundIfEmptyString(void)
+{
+    char cmd[] = {'\n'};
+
+    for(int i = 0; i < sizeof(cmd); i++)
+    {
+        cli_put(&cli, cmd[i]);
+    }
+
+    cli_status_t result = cli_process(&cli);
+
+    TEST_ASSERT_EQUAL_INT(CLI_E_CMD_NOT_FOUND, result);
+}
 #endif /* TEST */
