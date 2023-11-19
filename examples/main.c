@@ -27,12 +27,11 @@ cmd_t cmd_tbl[3] = {
     },
 };
 cli_t cli;
-cli_status_t rslt = CLI_OK;
 
 cli_status_t help_func(int argc, char **argv)
 {
     cli_status_t ok = CLI_OK;
-    cli.println("[cli] CLI HELP. Available commands:\n");
+    cli.println("CLI HELP. Available commands:\n");
     cli.println("  gpio (-set or -get)\n");
     cli.println("  adc (get_sample)\n");
     return ok;
@@ -45,12 +44,12 @@ cli_status_t gpio_func(int argc, char **argv)
     {
         int pin = atoi(argv[2]);
         int val = atoi(argv[3]);
-        cli.println("[cli] gpio set pin %d to %d\n", pin, val);
+        cli.println("gpio set pin %d to %d\n", pin, val);
     }
     else if(strcmp(argv[1], "-get") == 0 && argc == 3)
     {
         int pin = atoi(argv[2]);
-        cli.println("[cli] gpio get pin %d\n", pin);
+        cli.println("gpio get pin %d\n", pin);
     }
     else
     {
@@ -62,22 +61,26 @@ cli_status_t gpio_func(int argc, char **argv)
 cli_status_t adc_func(int argc, char **argv)
 {
     cli_status_t ok = CLI_OK;
+
     if(argc == 3)
     {
         if(strcmp(argv[1], "-sample_channel") == 0 && argc == 3)
         {
             int channel = atoi(argv[2]);
-            cli.println("[cli] adc sample channel %d\n", channel);
+            cli.println("adc sample channel %d\n", channel);
             return ok;
         }
     }
 
     cli.println("missing arguments\n");
+
     return CLI_E_INVALID_ARGS;
 }
 
 int user_uart_println(char *format, ...)
 {
+    printf("[cli] ");
+
     va_list args;
     va_start(args, format);
     vprintf(format, args);
@@ -90,9 +93,13 @@ int main(void)
     cli.cmd_tbl = cmd_tbl;
     cli.cmd_cnt = sizeof(cmd_tbl) / sizeof(cmd_t);
 
-    if((rslt = cli_init(&cli, cli_buffer, sizeof(cli_buffer))) != CLI_OK)
+    cli_status_t result = cli_init(&cli, cli_buffer, sizeof(cli_buffer));
+
+    if(result != CLI_OK)
     {
-        printf("CLI: Failed to initialise");
+        printf("ERROR: Failed to initialise cli.");
+
+        return 1;
     }
 
     printf("Welcome to the cli. Type 'help' to get a list of commands.\n");
