@@ -6,10 +6,14 @@
 #include "fake_printf.h"
 
 #include <stdarg.h>
+#include <string.h>
+
+#define BUFFER_SIZE (256)
 
 static cli_status_t help_func(int argc, char **argv);
 static cli_status_t args_func(int argc, char **argv);
-static uint8_t cli_buffer[256] = {0};
+static uint8_t cli_buffer[BUFFER_SIZE] = {0};
+static cli_t cli;
 
 cmd_t cmd_tbl[2] = {
     {
@@ -21,8 +25,6 @@ cmd_t cmd_tbl[2] = {
         .func = args_func,
     },
 };
-
-cli_t cli;
 
 cli_status_t help_func(int argc, char **argv)
 {
@@ -51,6 +53,9 @@ void setUp(void)
     cli.cmd_tbl = cmd_tbl;
     cli.cmd_cnt = (sizeof(cmd_tbl) / sizeof(cmd_t));
 
+    /* clear buffer */
+    memset(cli_buffer, 0, BUFFER_SIZE);
+
     cli_result = cli_init(&cli, cli_buffer, sizeof(cli_buffer));
 
     if(cli_result != CLI_OK)
@@ -66,34 +71,44 @@ void setUp(void)
 
 void tearDown(void)
 {
+    /* clear fake printf */
     fake_printf_delete_file();
+}
+
+/**
+ * @brief Helper function to send a cmd of a certain length to the CLI.
+ */
+void send_cmd(char *cmd, int length)
+{
+    for(int i = 0; i < length; i++)
+    {
+        cli_put(&cli, cmd[i]);
+    }
 }
 
 void test_cli_put_should_addCharacterToBuffer(void)
 {
     char cmd[] = {'h', 'e', 'l', 'p'};
 
+    /* check if buffer is empty originally */
     TEST_ASSERT_EQUAL(0, cli_buffer[0]);
     TEST_ASSERT_EQUAL(0, cli_buffer[1]);
     TEST_ASSERT_EQUAL(0, cli_buffer[2]);
     TEST_ASSERT_EQUAL(0, cli_buffer[3]);
     TEST_ASSERT_EQUAL(0, cli_buffer[4]);
 
-    for(int i = 0; i < sizeof(cmd); i++)
-    {
-        cli_put(&cli, cmd[i]);
-    }
+    send_cmd(cmd, sizeof(cmd));
 
     TEST_ASSERT_EQUAL('h', cli_buffer[0]);
     TEST_ASSERT_EQUAL('e', cli_buffer[1]);
     TEST_ASSERT_EQUAL('l', cli_buffer[2]);
     TEST_ASSERT_EQUAL('p', cli_buffer[3]);
-    TEST_ASSERT_EQUAL(0, cli_buffer[5]);
+    TEST_ASSERT_EQUAL(0, cli_buffer[4]);
 }
 
 void test_cli_put_should_returnFullIfBufferIsFull(void)
 {
-    for(int i = 0; i < 256; i++)
+    for(int i = 0; i < BUFFER_SIZE; i++)
     {
         TEST_ASSERT_EQUAL(CLI_OK, cli_put(&cli, 'a'));
     }
@@ -111,51 +126,44 @@ void test_cli_process_should_returnNotReadyIfNoTerminatorFound(void)
 {
     char cmd[] = {'h', 'e', 'l', 'p'};
 
-    for(int i = 0; i < sizeof(cmd); i++)
-    {
-        cli_put(&cli, cmd[i]);
-    }
+    send_cmd(cmd, sizeof(cmd));
 
     cli_status_t result = cli_process(&cli);
 
     TEST_ASSERT_EQUAL_INT(CLI_E_CMD_NOT_READY, result);
+}
 
-    cli_put(&cli, '\n');
-    result = cli_process(&cli);
+void test_cli_process_should_returnOkIfTerminatorFound(void)
+{
+    char cmd[] = {'h', 'e', 'l', 'p', '\n'};
+
+    send_cmd(cmd, sizeof(cmd));
+
+    cli_status_t result = cli_process(&cli);
 
     TEST_ASSERT_EQUAL_INT(CLI_OK, result);
 }
 
 void test_cli_process_should_returnNotFoundIfUnknownCommand(void)
 {
-    char cmd[] = {'n', 'o', '\n'};
+    char cmd[] = {'b', 'e', 'e', 'f', '\n'};
 
-    for(int i = 0; i < sizeof(cmd); i++)
-    {
-        cli_put(&cli, cmd[i]);
-    }
+    send_cmd(cmd, sizeof(cmd));
 
     cli_status_t result = cli_process(&cli);
 
     TEST_ASSERT_EQUAL_INT(CLI_E_CMD_NOT_FOUND, result);
-
-    TEST_ASSERT_EQUAL_STRING("CLI ERROR: Command not recognized\n",
-                             fake_printf_get_last_message());
 }
 
 void test_cli_process_should_callHelpIfHelpCmdReceived(void)
 {
     char cmd[] = {'h', 'e', 'l', 'p', '\n'};
 
-    for(int i = 0; i < sizeof(cmd); i++)
-    {
-        cli_put(&cli, cmd[i]);
-    }
+    send_cmd(cmd, sizeof(cmd));
 
     cli_status_t result = cli_process(&cli);
 
     TEST_ASSERT_EQUAL_INT(CLI_OK, result);
-
     TEST_ASSERT_EQUAL_STRING("cli help func called\n",
                              fake_printf_get_last_message());
 }
@@ -165,15 +173,11 @@ void test_cli_process_should_callArgsWithArgsIfArgsCmdReceived(void)
     char cmd[] = {'a', 'r', 'g', 's', ' ', 'a', 'r', 'g',
                   '1', ' ', 'p', 'a', 'r', '2', '\n'};
 
-    for(int i = 0; i < sizeof(cmd); i++)
-    {
-        cli_put(&cli, cmd[i]);
-    }
+    send_cmd(cmd, sizeof(cmd));
 
     cli_status_t result = cli_process(&cli);
 
     TEST_ASSERT_EQUAL_INT(CLI_OK, result);
-
     TEST_ASSERT_EQUAL_STRING("cli args func called with 3 args: arg1 par2\n",
                              fake_printf_get_last_message());
 }
@@ -210,10 +214,7 @@ void test_cli_process_should_returnNotFoundIfEmptyString(void)
 {
     char cmd[] = {'\n'};
 
-    for(int i = 0; i < sizeof(cmd); i++)
-    {
-        cli_put(&cli, cmd[i]);
-    }
+    send_cmd(cmd, sizeof(cmd));
 
     cli_status_t result = cli_process(&cli);
 

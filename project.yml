@@ -31,12 +31,12 @@
 
 :paths:
   :test:
-    - +:test/**
-    - -:test/support
+    - +:tests/**
+    - -:tests/support
   :source:
     - src/**
   :support:
-    - test/support
+    - tests/support
   :libraries: []
 
 :defines:

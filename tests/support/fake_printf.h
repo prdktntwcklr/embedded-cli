@@ -6,4 +6,4 @@ char *fake_printf_get_last_message(void);
 void fake_printf_reset(void);
 void fake_printf_delete_file(void);
 
-#endif
+#endif /* FAKE_PRINTF_H */
