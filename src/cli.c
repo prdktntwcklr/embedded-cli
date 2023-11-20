@@ -2,6 +2,8 @@
  * MIT License
  *
  * Copyright (c) 2019 Sean Farrelly
+ * Copyright (c) 2021 Ovyl
+ * Copyright (c) 2023 prdktntwcklr
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,12 +37,12 @@ static void cli_print(cli_t *cli, char *msg);
 
 cli_status_t cli_init(cli_t *cli, uint8_t *rx_buf_ptr, uint16_t rx_buf_size)
 {
-    if(rx_buf_ptr == NULL)
+    if(cli->println == NULL || cli->cmd_tbl == NULL || rx_buf_ptr == NULL)
     {
         return CLI_E_NULL_PTR;
     }
 
-    if(rx_buf_size == 0)
+    if(cli->cmd_cnt == 0 || rx_buf_size == 0)
     {
         return CLI_E_INVALID_ARGS;
     }
@@ -71,12 +73,6 @@ cli_status_t cli_process(cli_t *cli)
     /* Get the first token (cmd name) */
     argv[0] = strtok((char *)cli->rx_data.buf_ptr, " ");
 
-    /* If we send an empty string, return command not found */
-    if(argv[0] == NULL)
-    {
-        return CLI_E_CMD_NOT_FOUND;
-    }
-
     /* Walk through the other tokens (parameters) */
     while((argv[argc] != NULL) && (argc < MAX_ARGS))
     {
@@ -87,6 +83,12 @@ cli_status_t cli_process(cli_t *cli)
      * the command name. */
     for(size_t i = 0; i < cli->cmd_cnt; i++)
     {
+        /* Guard condition to make sure we have acutally received a command */
+        if(argv[0] == NULL)
+        {
+            break;
+        }
+
         if(strcmp(argv[0], cli->cmd_tbl[i].cmd) == 0)
         {
             /* Found a match, execute the associated function. */
