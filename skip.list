@@ -1,0 +1,2 @@
+# do not analyze test files
+-*tests*

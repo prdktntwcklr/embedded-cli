@@ -19,9 +19,5 @@ jobs:
         run:  docker compose build
       - name: build project
         run:  docker compose run --rm build-project
-      - name: run static analysis
-        run:  docker compose run --rm static-analysis
       - name: run unit tests
         run:  docker compose run --rm unit-tests
-      - name: run test coverage report
-        run:  docker compose run --rm code-coverage

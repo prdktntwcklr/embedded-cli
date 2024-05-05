@@ -32,7 +32,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define MAX_ARGS       30
+#define MAX_ARGS       (30)
 #define CMD_TERMINATOR '\n' /* Delimitor denoting end of cmd */
 
 typedef enum
@@ -49,17 +49,17 @@ typedef enum
 /*!
  * @brief Function type declarations.
  */
-typedef cli_status_t (*cmd_func_ptr_t)(int argc, char **argv);
-typedef int (*println_func_ptr_t)(char *format, ...);
+typedef cli_status_t (*cmd_fptr)(int argc, char **argv);
+typedef int (*println_fptr)(char *format, ...);
 
 /*!
  * @brief Command structure, consisting of a name and function pointer.
  */
 typedef struct
 {
-    char *cmd;           /* Command name. */
-    cmd_func_ptr_t func; /* Function pointer to associated function. */
-    char *help_text;     /* Help text. */
+    char *cmd;       /* Command name. */
+    cmd_fptr func;   /* Function pointer to associated function. */
+    char *help_text; /* Help text. */
 } cmd_t;
 
 /*!
@@ -78,10 +78,10 @@ typedef struct
  */
 typedef struct
 {
-    println_func_ptr_t println; /* Pointer to user defined println function.*/
-    cmd_t *cmd_tbl;    /* Pointer to series of commands to be accepted. */
-    size_t cmd_cnt;    /* Number of commands in cmd_tbl. */
-    rx_data_t rx_data; /* rx_data struct */
+    println_fptr println; /* Pointer to user defined println function.*/
+    cmd_t *cmd_tbl;       /* Pointer to series of commands to be accepted. */
+    size_t cmd_cnt;       /* Number of commands in cmd_tbl. */
+    rx_data_t rx_data;    /* rx_data struct */
 } cli_t;
 
 #endif /* CLI_DEFS_H */

@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
 # set working directory
 WORKDIR /app
@@ -12,9 +12,9 @@ RUN ln -snf /usr/share/zoneinfo/$CONTAINER_TIMEZONE /etc/localtime && \
 
 # update package information and install required packages
 RUN apt-get update && \
-    xargs -a packages.txt apt-get install --no-install-recommends -y && \
-    pip install --no-cache-dir pre-commit && \
-    gem install ceedling
+    xargs -a packages.txt apt-get install --no-install-recommends -y
+RUN pip install --no-cache-dir codechecker pre-commit
+RUN gem install ceedling
 
 # clean up stale packages
 RUN apt-get clean -y && \
