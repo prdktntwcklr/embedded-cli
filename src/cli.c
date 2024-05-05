@@ -25,7 +25,8 @@
  *
  */
 
-/*! @file cli.c
+/*!
+ * @file cli.c
  * @brief Implementation of command-line interface.
  */
 #include "cli.h"
@@ -74,7 +75,7 @@ cli_status_t cli_process(cli_t *cli)
     argv[0] = strtok((char *)cli->rx_data.buf_ptr, " ");
 
     /* Walk through the other tokens (parameters) */
-    while((argv[argc] != NULL) && (argc < MAX_ARGS))
+    while((argv[argc] != NULL) && (argc < (MAX_ARGS - 1)))
     {
         argv[++argc] = strtok(NULL, " ");
     }

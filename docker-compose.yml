@@ -5,7 +5,7 @@ services:
     build: .
   build-project:
     image: cli-embedded
-    command: bash -c "cmake --version && cmake -B build/ && cmake --build build/"
+    command: bash -c "chmod +x build.sh && ./build.sh"
     depends_on:
     - build-image
     volumes:
@@ -26,7 +26,7 @@ services:
     - ./:/app
   static-analysis:
     image: cli-embedded
-    command: bash -c "chmod +x clang-tidy.sh && ./clang-tidy.sh"
+    command: bash -c "chmod +x static-analysis.sh && ./static-analysis.sh"
     depends_on:
     - build-image
     volumes:

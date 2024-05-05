@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define UNUSED(x) ((void)(x))
+
 static cli_status_t help_func(int argc, char **argv);
 static cli_status_t gpio_func(int argc, char **argv);
 static cli_status_t adc_func(int argc, char **argv);
@@ -30,6 +32,9 @@ cli_t cli;
 
 cli_status_t help_func(int argc, char **argv)
 {
+    UNUSED(argc);
+    UNUSED(argv);
+
     cli_status_t ok = CLI_OK;
     cli.println("CLI HELP. Available commands:\n");
     cli.println("  gpio (-set or -get)\n");
@@ -42,13 +47,13 @@ cli_status_t gpio_func(int argc, char **argv)
     cli_status_t ok = CLI_OK;
     if(strcmp(argv[1], "-set") == 0 && argc == 4)
     {
-        int pin = atoi(argv[2]);
-        int val = atoi(argv[3]);
+        int pin = (int)strtol(argv[2], NULL, 10);
+        int val = (int)strtol(argv[3], NULL, 10);
         cli.println("gpio set pin %d to %d\n", pin, val);
     }
     else if(strcmp(argv[1], "-get") == 0 && argc == 3)
     {
-        int pin = atoi(argv[2]);
+        int pin = (int)strtol(argv[2], NULL, 10);
         cli.println("gpio get pin %d\n", pin);
     }
     else
@@ -66,7 +71,7 @@ cli_status_t adc_func(int argc, char **argv)
     {
         if(strcmp(argv[1], "-sample_channel") == 0 && argc == 3)
         {
-            int channel = atoi(argv[2]);
+            int channel = (int)strtol(argv[2], NULL, 10);
             cli.println("adc sample channel %d\n", channel);
             return ok;
         }
@@ -83,8 +88,13 @@ int user_uart_println(char *format, ...)
 
     va_list args;
     va_start(args, format);
-    vprintf(format, args);
+
+    // NOLINTNEXTLINE(clang-diagnostic-format-nonliteral)
+    int chars_written = vprintf(format, args);
+
     va_end(args);
+
+    return chars_written;
 }
 
 int main(void)
@@ -106,7 +116,7 @@ int main(void)
 
     while(1)
     {
-        char in = fgetc(stdin);
+        char in = (char)fgetc(stdin);
         cli_put(&cli, in);
         cli_process(&cli);
     }
