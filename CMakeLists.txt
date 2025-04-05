@@ -17,3 +17,8 @@ add_executable(cli_example examples/main.c ${SRC_FILES})
 
 # set the directories that should be included in the build command for this target
 target_include_directories(cli_example PRIVATE src)
+
+if(TARGET_GROUP STREQUAL test)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

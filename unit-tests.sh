@@ -1,14 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-checker=ceedling
+set -eou pipefail
 
-echo ""
-echo " ========================================================= "
-echo "     Running Unit Tests                                    "
-echo "     using $checker ...                                    "
-echo " ========================================================= "
-echo ""
+build_dir=build
 
-$checker version
-$checker clobber
-$checker test:all
+rm -rf $build_dir/
+mkdir -p $build_dir/
+cmake -DTARGET_GROUP=test -S . -B $build_dir/
+cmake --build $build_dir/
+ctest --test-dir $build_dir/tests/ -V
