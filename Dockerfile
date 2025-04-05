@@ -14,7 +14,6 @@ RUN ln -snf /usr/share/zoneinfo/$CONTAINER_TIMEZONE /etc/localtime && \
 RUN apt-get update && \
     xargs -a packages.txt apt-get install --no-install-recommends -y
 RUN pip install --no-cache-dir codechecker pre-commit
-RUN gem install ceedling
 
 # clean up stale packages
 RUN apt-get clean -y && \

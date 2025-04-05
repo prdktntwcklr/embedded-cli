@@ -1,6 +1,6 @@
 #include "fake_printf.h"
 
-#include "unity.h"
+#include "unity.h" // needed for TEST_FAIL
 
 #include <errno.h>
 #include <stdarg.h>
@@ -27,10 +27,12 @@ int fake_printf(char *format, ...)
 
     va_list args;
     va_start(args, format);
-    vfprintf(file, format, args);
+    int bytes_written = vfprintf(file, format, args);
     va_end(args);
 
     fclose(file);
+
+    return bytes_written;
 }
 
 char *fake_printf_get_last_message(void)

@@ -99,10 +99,10 @@ void test_cli_put_should_addCharacterToBuffer(void)
 
     send_cmd(cmd, sizeof(cmd));
 
-    TEST_ASSERT_EQUAL('h', cli_buffer[0]);
-    TEST_ASSERT_EQUAL('e', cli_buffer[1]);
-    TEST_ASSERT_EQUAL('l', cli_buffer[2]);
-    TEST_ASSERT_EQUAL('p', cli_buffer[3]);
+    TEST_ASSERT_EQUAL_CHAR('h', cli_buffer[0]);
+    TEST_ASSERT_EQUAL_CHAR('e', cli_buffer[1]);
+    TEST_ASSERT_EQUAL_CHAR('l', cli_buffer[2]);
+    TEST_ASSERT_EQUAL_CHAR('p', cli_buffer[3]);
     TEST_ASSERT_EQUAL(0, cli_buffer[4]);
 }
 
@@ -219,5 +219,21 @@ void test_cli_process_should_returnNotFoundIfEmptyString(void)
     cli_status_t result = cli_process(&cli);
 
     TEST_ASSERT_EQUAL_INT(CLI_E_CMD_NOT_FOUND, result);
+}
+
+int main(void)
+{
+    UNITY_BEGIN();
+    RUN_TEST(test_cli_put_should_addCharacterToBuffer);
+    RUN_TEST(test_cli_put_should_returnFullIfBufferIsFull);
+    RUN_TEST(test_cli_process_should_returnNotReadyIfNoTerminatorFound);
+    RUN_TEST(test_cli_process_should_returnOkIfTerminatorFound);
+    RUN_TEST(test_cli_process_should_returnNotFoundIfUnknownCommand);
+    RUN_TEST(test_cli_process_should_callHelpIfHelpCmdReceived);
+    RUN_TEST(test_cli_process_should_callArgsWithArgsIfArgsCmdReceived);
+    RUN_TEST(test_cli_init_should_failIfNullPointerPassed);
+    RUN_TEST(test_cli_init_should_failIfBufSizeIsZero);
+    RUN_TEST(test_cli_process_should_returnNotFoundIfEmptyString);
+    return UNITY_END();
 }
 #endif /* TEST */
