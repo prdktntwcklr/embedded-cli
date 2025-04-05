@@ -1,6 +1,6 @@
 #include "fake_printf.h"
 
-#include "unity.h"
+#include "unity.h" // needed for TEST_FAIL
 
 #include <errno.h>
 #include <stdarg.h>
