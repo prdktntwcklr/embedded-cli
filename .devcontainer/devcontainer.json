@@ -12,6 +12,7 @@
     "customizations": {
         "vscode": {
             "extensions": [
+                "ms-vscode.cmake-tools",
                 "ms-vscode.cpptools"
             ],
             "settings": {
@@ -19,5 +20,5 @@
             }
         }
     },
-    "postStartCommand": "pre-commit --version && pre-commit install"
+    "postCreateCommand": "cp ${containerWorkspaceFolder}/.devcontainer/.bashrc /root/.bashrc"
 }
