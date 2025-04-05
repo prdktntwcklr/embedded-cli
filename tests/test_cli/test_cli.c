@@ -99,10 +99,10 @@ void test_cli_put_should_addCharacterToBuffer(void)
 
     send_cmd(cmd, sizeof(cmd));
 
-    TEST_ASSERT_EQUAL('h', cli_buffer[0]);
-    TEST_ASSERT_EQUAL('e', cli_buffer[1]);
-    TEST_ASSERT_EQUAL('l', cli_buffer[2]);
-    TEST_ASSERT_EQUAL('p', cli_buffer[3]);
+    TEST_ASSERT_EQUAL_CHAR('h', cli_buffer[0]);
+    TEST_ASSERT_EQUAL_CHAR('e', cli_buffer[1]);
+    TEST_ASSERT_EQUAL_CHAR('l', cli_buffer[2]);
+    TEST_ASSERT_EQUAL_CHAR('p', cli_buffer[3]);
     TEST_ASSERT_EQUAL(0, cli_buffer[4]);
 }
 
