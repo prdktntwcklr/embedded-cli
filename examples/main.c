@@ -45,21 +45,26 @@ cli_status_t help_func(int argc, char **argv)
 cli_status_t gpio_func(int argc, char **argv)
 {
     cli_status_t ok = CLI_OK;
-    if(strcmp(argv[1], "-set") == 0 && argc == 4)
+
+    if(argc >= 3)
     {
-        int pin = (int)strtol(argv[2], NULL, 10);
-        int val = (int)strtol(argv[3], NULL, 10);
-        cli.println("gpio set pin %d to %d\n", pin, val);
+        if(strcmp(argv[1], "-set") == 0 && argc == 4)
+        {
+            int pin = (int)strtol(argv[2], NULL, 10);
+            int val = (int)strtol(argv[3], NULL, 10);
+            cli.println("gpio setting pin %d to: %d\n", pin, val);
+            return ok;
+        }
+        else if(strcmp(argv[1], "-get") == 0 && argc == 3)
+        {
+            int pin = (int)strtol(argv[2], NULL, 10);
+            cli.println("gpio getting pin: %d\n", pin);
+            return ok;
+        }
     }
-    else if(strcmp(argv[1], "-get") == 0 && argc == 3)
-    {
-        int pin = (int)strtol(argv[2], NULL, 10);
-        cli.println("gpio get pin %d\n", pin);
-    }
-    else
-    {
-        cli.println("missing arguments\n");
-    }
+
+    cli.println("arguments missing or unknown\n");
+
     return ok;
 }
 
@@ -77,7 +82,7 @@ cli_status_t adc_func(int argc, char **argv)
         }
     }
 
-    cli.println("missing arguments\n");
+    cli.println("arguments missing or unknown\n");
 
     return CLI_E_INVALID_ARGS;
 }
