@@ -3,7 +3,7 @@ services:
     image: cli-embedded
     command: bash -c "echo build-image completed."
     build: .
-  build-project:
+  build-example:
     image: cli-embedded
     command: bash -c "chmod +x build-example.sh && ./build-example.sh"
     depends_on:
