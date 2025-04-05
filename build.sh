@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-# Script to run a pristine build from inside the Docker container
+set -eou pipefail
 
-rm -rf build
+build_dir=build
+
+rm -rf ${build_dir}
 cmake --version
-cmake -B build
-cmake --build build
+cmake -B ${build_dir}
+cmake --build ${build_dir}
