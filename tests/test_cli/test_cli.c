@@ -48,7 +48,7 @@ cli_status_t args_func(int argc, char **argv)
     return CLI_OK;
 }
 
-void setUp(void)
+void initialize_cli(void)
 {
     cli_status_t cli_result = CLI_MAX_STATUS;
     cli.println = fake_printf;
@@ -67,13 +67,16 @@ void setUp(void)
 
     TEST_ASSERT_EQUAL_STRING("cli_init() ok.\n",
                              fake_printf_get_last_message());
+}
 
+void setUp(void)
+{
+    initialize_cli();
     fake_printf_reset();
 }
 
 void tearDown(void)
 {
-    /* clear fake printf */
     fake_printf_delete_file();
 }
 
@@ -184,7 +187,19 @@ void test_cli_process_should_callArgsWithArgsIfArgsCmdReceived(void)
                              fake_printf_get_last_message());
 }
 
-void test_cli_init_should_failIfNullPointerPassed(void)
+void test_cli_init_should_failIfNullPointerPassedForCli(void)
+{
+    cli_t bad_cli;
+
+    cli_status_t cli_result = CLI_MAX_STATUS;
+    bad_cli.println = fake_printf;
+    bad_cli.cmd_tbl = cmd_tbl;
+    bad_cli.cmd_cnt = (sizeof(cmd_tbl) / sizeof(cmd_t));
+
+    SHOULD_FAIL_ASSERT(cli_init(NULL, cli_buffer, sizeof(cli_buffer)));
+}
+
+void test_cli_init_should_failIfNullPointerPassedForBufferPtr(void)
 {
     cli_t bad_cli;
 
@@ -229,8 +244,9 @@ int main(void)
     RUN_TEST(test_cli_process_should_returnNotFoundIfUnknownCommand);
     RUN_TEST(test_cli_process_should_callHelpIfHelpCmdReceived);
     RUN_TEST(test_cli_process_should_callArgsWithArgsIfArgsCmdReceived);
-    RUN_TEST(test_cli_init_should_failIfNullPointerPassed);
-    // RUN_TEST(test_cli_init_should_failIfBufSizeIsZero);
+    RUN_TEST(test_cli_init_should_failIfNullPointerPassedForCli);
+    RUN_TEST(test_cli_init_should_failIfNullPointerPassedForBufferPtr);
+    RUN_TEST(test_cli_init_should_failIfBufSizeIsZero);
     RUN_TEST(test_cli_process_should_returnNotFoundIfEmptyString);
     return UNITY_END();
 }
