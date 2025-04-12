@@ -165,6 +165,7 @@ cli_status_t cli_put(cli_t *cli, char character)
 static void cli_print(cli_t *cli, char *msg)
 {
     assert(cli != NULL);
+    assert(msg != NULL);
 
     cli->println(msg);
 }
