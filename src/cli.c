@@ -31,22 +31,32 @@
  */
 #include "cli.h"
 
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
+
+/*!
+ * @brief   Custom assert function for unit testing.
+ * @details https://www.electronvector.com/blog/unit-testing-with-asserts
+ */
+#if TEST
+#undef assert
+#include "CException.h"
+#define assert(condition)                                                      \
+    if(!(condition))                                                           \
+    Throw(0)
+#endif
 
 static void cli_print(cli_t *cli, char *msg);
 
 cli_status_t cli_init(cli_t *cli, uint8_t *rx_buf_ptr, uint16_t rx_buf_size)
 {
-    if(cli->println == NULL || cli->cmd_tbl == NULL || rx_buf_ptr == NULL)
-    {
-        return CLI_E_NULL_PTR;
-    }
-
-    if(cli->cmd_cnt == 0 || rx_buf_size == 0)
-    {
-        return CLI_E_INVALID_ARGS;
-    }
+    assert(cli != NULL);
+    assert(cli->println != NULL);
+    assert(cli->cmd_tbl != NULL);
+    assert(cli->cmd_cnt != 0);
+    assert(rx_buf_ptr != NULL);
+    assert(rx_buf_size != 0);
 
     /* Reset buffer */
     cli->rx_data.current_buf_length = 0;
@@ -61,6 +71,8 @@ cli_status_t cli_init(cli_t *cli, uint8_t *rx_buf_ptr, uint16_t rx_buf_size)
 
 cli_status_t cli_process(cli_t *cli)
 {
+    assert(cli != NULL);
+
     uint8_t argc = 0;
     char *argv[MAX_ARGS];
 
@@ -108,6 +120,8 @@ cli_status_t cli_process(cli_t *cli)
 
 cli_status_t cli_put(cli_t *cli, char character)
 {
+    assert(cli != NULL);
+
     /* NOLINTNEXTLINE(hicpp-multiway-paths-covered) */
     switch(character)
     {
@@ -149,5 +163,7 @@ cli_status_t cli_put(cli_t *cli, char character)
 
 static void cli_print(cli_t *cli, char *msg)
 {
+    assert(cli != NULL);
+
     cli->println(msg);
 }

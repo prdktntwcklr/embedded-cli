@@ -1,5 +1,5 @@
 add_executable(test_cli test_cli.c ${CMAKE_SOURCE_DIR}/src/cli.c)
 target_compile_definitions(test_cli PUBLIC TEST)
 target_include_directories(test_cli PRIVATE ${CMAKE_SOURCE_DIR}/src ${fff_dir})
-target_link_libraries(test_cli PUBLIC unity fake_printf)
+target_link_libraries(test_cli PUBLIC unity check_assert fake_printf)
 add_test(test_cli test_cli)

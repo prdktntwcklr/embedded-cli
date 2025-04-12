@@ -38,7 +38,6 @@
 typedef enum
 {
     CLI_OK,              /* API execution successful. */
-    CLI_E_NULL_PTR,      /* Null pointer error. */
     CLI_E_CMD_NOT_FOUND, /* Command name not found in command table. */
     CLI_E_INVALID_ARGS,  /* Invalid function parameters/arguments.   */
     CLI_E_BUF_FULL,      /* CLI buffer full.                         */
