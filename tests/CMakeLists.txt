@@ -21,8 +21,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(cexception)
 
-set(cexception_dir "${CMAKE_BINARY_DIR}/_deps/cexception-src/lib")
-
 # download fff.h directly, since meekrosoft/fff does not work with FetchContent
 set(fff_dir "${CMAKE_BINARY_DIR}/_deps/fff")
 

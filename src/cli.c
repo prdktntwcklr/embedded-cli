@@ -36,7 +36,8 @@
 #include <string.h>
 
 /*!
- * @brief   Custom assert function for unit testing.
+ * @brief   Custom assert function that works with unit testing.
+ *
  * @details https://www.electronvector.com/blog/unit-testing-with-asserts
  */
 #if TEST
