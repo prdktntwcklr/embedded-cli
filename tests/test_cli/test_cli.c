@@ -72,7 +72,9 @@ void initialize_cli(void)
 void setUp(void)
 {
     initialize_cli();
-    fake_printf_reset();
+
+    // clear "cli_init() ok" from fake printf
+    fake_printf_clear();
 }
 
 void tearDown(void)
