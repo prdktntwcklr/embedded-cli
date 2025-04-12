@@ -55,7 +55,7 @@ char *fake_printf_get_last_message(void)
     return message;
 }
 
-void fake_printf_reset(void)
+void fake_printf_clear(void)
 {
     /* open file in write mode to clear contents */
     FILE *file = fopen(FILE_NAME, "w");

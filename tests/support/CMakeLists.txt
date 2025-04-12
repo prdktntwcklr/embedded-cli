@@ -1,1 +1,2 @@
+add_subdirectory(check_assert)
 add_subdirectory(fake_printf)

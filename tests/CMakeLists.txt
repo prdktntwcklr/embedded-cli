@@ -1,6 +1,7 @@
 include(FetchContent)
 
 set(unity_version "v2.6.1")
+set(cexception_version "v1.3.4")
 set(fff_version "v1.1")
 set(fff_hash MD5=10a2d739289c1054f6784fcc7203c8fd)
 
@@ -11,6 +12,14 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(unity)
+
+FetchContent_Declare(
+  cexception
+  GIT_REPOSITORY https://github.com/ThrowTheSwitch/CException.git
+  GIT_TAG ${cexception_version}
+)
+
+FetchContent_MakeAvailable(cexception)
 
 # download fff.h directly, since meekrosoft/fff does not work with FetchContent
 set(fff_dir "${CMAKE_BINARY_DIR}/_deps/fff")
